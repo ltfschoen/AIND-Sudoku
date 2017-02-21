@@ -2,6 +2,7 @@
 
 # IntelliJ User Specific Settings - https://intellij-support.jetbrains.com/hc/en-us/articles/206544839-How-to-manage-projects-under-Version-Control-Systems
 .DS_Store
+.idea/*
 .idea/copyright/
 .idea/workspace.xml
 .idea/tasks.xml
