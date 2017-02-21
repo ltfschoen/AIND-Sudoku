@@ -16,7 +16,15 @@ def assign_value(values, box, value):
     return values
 
 def naked_twins(values):
-    """Eliminate values using the naked twins strategy.
+    """
+    Eliminate values using the naked twins strategy. Find all instances of naked twins by:
+    - Find all boxes with exactly two possibilities by iterating over all boxes in puzzle.
+    - Storing in a list of tuples all pairs of boxes that each contain the same twin possibilities (naked twins)
+    - Iterate over all the pairs of naked twins to:
+        - Find peer boxes that they have in common between them based on calculating their intersection
+        - With the set of intersecting peers determined, iterate over the set of intersecting peers and
+        delete the naked twins values from each of those intersecting peers that contain more than two possible values
+
     Args:
         values(dict): a dictionary of the form {'box_name': '123456789', ...}
 
@@ -24,8 +32,37 @@ def naked_twins(values):
         the values dictionary with the naked twins eliminated from peers.
     """
 
-    # Find all instances of naked twins
-    # Eliminate the naked twins as possibilities for their peers
+    # before = list(values)
+    # print("Before naked twin:", values)
+
+    # Find all boxes containing exactly two possibilities
+    possible_twins = [box
+                      for box in values.keys()
+                      if len(values[box]) == 2]
+    # print("Possible naked twins: ", possible_twins)
+
+    # Store in list of tuples all pairs of boxes that each contain the same twin possibilities (naked twins)
+    naked_twins = []
+    for box_twin1 in possible_twins:
+        for box_twin2 in peers[box_twin1]:
+            if values[box_twin1] == values[box_twin2]:
+                naked_twins.append((box_twin1, box_twin2))
+    # print("Naked twins: ", naked_twins)
+
+    # Iterate over all the pairs of naked twins.
+    #   - Find peer boxes that they have in common between them based on calculating their intersection
+    #   - Iterate over the set of intersecting peers
+    #   - Delete the naked twins values from each of those intersecting peers that contain over two possible values
+    for index in range(len(naked_twins)):
+        box1, box2 = naked_twins[index][0], naked_twins[index][1]
+        peers1, peers2 = peers[box1], peers[box2]
+        peers_intersection = set(peers1) & set(peers2)
+        for peer_box in peers_intersection:
+            if len(values[peer_box]) > 2:
+                for digit in values[box1]:
+                    values[peer_box] = values[peer_box].replace(digit, '')
+    # print("After naked twin: ", values)
+    return values
 
 def cross(a, b):
     """
@@ -142,6 +179,7 @@ def display(values):
     Args:
         values(dict): The sudoku in dictionary form
     """
+
     width = 1+max(len(values[s]) for s in boxes)
     line = '+'.join(['-'*(width*3)]*3)
     for r in rows:
@@ -178,7 +216,9 @@ def only_choice(values):
     """
     for unit in unitlist:
         for digit in '123456789':
-            dplaces = [box for box in unit if digit in values[box]]
+            dplaces = [box
+                       for box in unit
+                       if digit in values[box]]
             if len(dplaces) == 1:
                 values[dplaces[0]] = digit
     return values
@@ -196,17 +236,25 @@ def reduce_puzzle(values):
     stalled = False
     while not stalled:
         # Check how many boxes have a determined value
-        solved_values_before = len([box for box in values.keys() if len(values[box]) == 1])
-        # Your code here: Use the Eliminate Strategy
+        solved_values_before = len([box
+                                    for box in values.keys()
+                                    if len(values[box]) == 1])
+        # Use the Eliminate Strategy
         values = eliminate(values)
-        # Your code here: Use the Only Choice Strategy
+        # Use the Naked Twins Strategy
+        values = naked_twins(values)
+        # Use the Only Choice Strategy
         values = only_choice(values)
         # Check how many boxes have a determined value, to compare
-        solved_values_after = len([box for box in values.keys() if len(values[box]) == 1])
+        solved_values_after = len([box
+                                   for box in values.keys()
+                                   if len(values[box]) == 1])
         # If no new values were added, stop the loop.
         stalled = solved_values_before == solved_values_after
         # Sanity check, return False if there is a box with zero available values:
-        if len([box for box in values.keys() if len(values[box]) == 0]):
+        if len([box
+                for box in values.keys()
+                if len(values[box]) == 0]):
             return False
     return values
 
@@ -224,7 +272,9 @@ def search(values):
 
     # Choose one of the unfilled squares with the fewest possibilities
     # and extract the n,s (i.e. 2 possibilities at 'A' would return: 2, 'A')
-    n,s = min((len(values[s]), s) for s in boxes if len(values[s]) > 1)
+    n,s = min((len(values[s]), s)
+              for s in boxes
+              if len(values[s]) > 1)
 
     # Now use recursion to solve each one of the resulting Sudokus,
     # and if one returns a value (not False), return that answer!
@@ -247,6 +297,7 @@ def solve(grid):
     """
     # Get Sudoku grid representation with unsolved boxes populated with possible values
     result = grid_values(grid)
+    display(result)
     # Call recursive function that performs Depth First Search using Constraint Propagation techniques
     # of Elimination and Only Choice to solve harder Sudoku problems including those using diagonals as peers
     output = search(result)
@@ -254,8 +305,13 @@ def solve(grid):
         return output
 
 if __name__ == '__main__':
-    diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
-    display(solve(diag_sudoku_grid))
+    # diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
+    # naked_twins_grid1 = '84.632.....34798257..518.6...6.97..24.8256..12..84.6...8..65..3.54.2.7.8...784.96'
+    naked_twins_grid2 = '1.4.9..68956.18.34..84.695151.....868..6...1264..8..97781923645495.6.823.6.854179' # from test1
+
+    output = solve(naked_twins_grid2)
+    if output:
+        display(solve(naked_twins_grid2))
 
     try:
         from visualize import visualize_assignments
