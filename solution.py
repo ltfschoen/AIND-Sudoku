@@ -60,7 +60,9 @@ def naked_twins(values):
         for peer_box in peers_intersection:
             if len(values[peer_box]) > 2:
                 for digit in values[box1]:
-                    values[peer_box] = values[peer_box].replace(digit, '')
+                    # values[peer_box] = values[peer_box].replace(digit, '')
+                    # PyGame Attempt
+                    values = assign_value(values, peer_box, values[peer_box].replace(digit,''))
     # print("After naked twin: ", values)
     return values
 
@@ -200,8 +202,11 @@ def eliminate(values):
             peer_keys = peers[k]
             digit = update_dict[k]
             for pk in peer_keys:
-                update_dict[pk] = update_dict[pk].replace(digit,'')
-    return update_dict
+                # update_dict[pk] = update_dict[pk].replace(digit,'')
+                # PyGame Attempt
+                values = assign_value(values, pk, values[pk].replace(digit,''))
+
+    return values
 
 def only_choice(values):
     """
@@ -220,7 +225,9 @@ def only_choice(values):
                        for box in unit
                        if digit in values[box]]
             if len(dplaces) == 1:
-                values[dplaces[0]] = digit
+                # values[dplaces[0]] = digit
+                # PyGame Attempt
+                values = assign_value(values, dplaces[0], digit)
     return values
 
 def reduce_puzzle(values):
@@ -296,22 +303,29 @@ def solve(grid):
         The dictionary representation of the final sudoku grid. False if no solution exists.
     """
     # Get Sudoku grid representation with unsolved boxes populated with possible values
-    result = grid_values(grid)
-    display(result)
+    values = grid_values(grid)
+    # display(values)
     # Call recursive function that performs Depth First Search using Constraint Propagation techniques
     # of Elimination and Only Choice to solve harder Sudoku problems including those using diagonals as peers
-    output = search(result)
-    if not isinstance(output, bool):
-        return output
+    values = search(values)
+
+    # print("values 1: ", values)
+
+    if not isinstance(values, bool):
+        return values
 
 if __name__ == '__main__':
-    # diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
+    diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
     # naked_twins_grid1 = '84.632.....34798257..518.6...6.97..24.8256..12..84.6...8..65..3.54.2.7.8...784.96'
-    naked_twins_grid2 = '1.4.9..68956.18.34..84.695151.....868..6...1264..8..97781923645495.6.823.6.854179' # from test1
+    # naked_twins_grid2 = '1.4.9..68956.18.34..84.695151.....868..6...1264..8..97781923645495.6.823.6.854179' # from test1
+    grid = diag_sudoku_grid
 
-    output = solve(naked_twins_grid2)
-    if output:
-        display(solve(naked_twins_grid2))
+    values = solve(grid)
+
+    # print("values 2: ", values)
+
+    if values:
+        display(solve(grid))
 
     try:
         from visualize import visualize_assignments
