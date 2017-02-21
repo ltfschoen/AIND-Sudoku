@@ -45,7 +45,7 @@ When all boxes have a single value (only one possible value) then the problem is
 
 [ ] - Naked twins implemented correctly / The student correctly uses constraint propagation to solve the
 naked twins problem by enforcing the constraint that no squares outside the two naked twins squares can
-contain the twin values
+contain the twin values http://www.sudokudragon.com/tutorialnakedtwins.htm
 
 [X] - Diagonal Sudoku implemented correctly. / The student correctly solves the diagonal sudoku using
 constraint propagation by adding the new constraint of the diagonal sudoku
