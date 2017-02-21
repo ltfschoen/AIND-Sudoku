@@ -221,7 +221,7 @@ def naked_twins(values):
     for index in range(len(naked_twins)):
         box1, box2 = naked_twins[index][0], naked_twins[index][1]
         peers1, peers2 = peers[box1], peers[box2]
-        peers_intersection = set(peers1) & set(peers2)
+        peers_intersection = set(peers1).intersection(peers2)
         for peer_box in peers_intersection:
             if len(values[peer_box]) > 2:
                 for digit in values[box1]:
