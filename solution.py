@@ -118,7 +118,7 @@ def eliminate_twin_values_from_peers(naked_twins, values):
         peers1, peers2 = peers[box1], peers[box2]
         peers_intersection = set(peers1).intersection(peers2)
         for peer_box in peers_intersection:
-            if len(values[peer_box]) > 2:
+            if len(values[peer_box]) > 1:
                 for digit in values[box1]:
                     # values[peer_box] = values[peer_box].replace(digit, '')
                     # PyGame Attempt
