@@ -1,3 +1,5 @@
+import logging
+
 assignments = []
 
 # Box - dictionary with keys for the strings in each box, an value
@@ -114,6 +116,8 @@ def grid_values(grid):
               'I9': '123456789'
             }
     """
+    logging.info("Converting Sudoku puzzle to dictionary is processing")
+
     values = []
     all_digits = '123456789'
     for c in grid:
@@ -130,6 +134,7 @@ def display(values):
     Args:
         values(dict): The sudoku in dictionary form
     """
+    logging.info("Converting Sudoku puzzle dictionary to 2D grid is processing")
 
     width = 1+max(len(values[s]) for s in boxes)
     line = '+'.join(['-'*(width*3)]*3)
@@ -145,6 +150,8 @@ def eliminate(values):
     Output: Iterate over all boxes in puzzle that only have one value assigned to them,
     remove this value from every one of its peers, and return puzzle in dictionary form
     """
+    logging.info("Elimination Strategy is processing")
+
     update_dict = values
     for k, v in update_dict.items():
         if len(update_dict[k]) == 1:
@@ -168,6 +175,8 @@ def only_choice(values):
     Input: Sudoku in dictionary form.
     Output: Resulting Sudoku in dictionary form after filling in Only Choices.
     """
+    logging.info("Only Choice Strategy is processing")
+
     for unit in unitlist:
         for digit in '123456789':
             dplaces = [box
@@ -196,9 +205,7 @@ def naked_twins(values):
     Returns:
         the values dictionary with the naked twins eliminated from peers.
     """
-
-    # before = list(values)
-    # print("Before naked twin:", values)
+    logging.info("Naked Twins Strategy processing")
 
     # Find all boxes containing exactly two possibilities
     possible_twins = [box
@@ -243,6 +250,8 @@ def reduce_puzzle(values):
     """
     stalled = False
     while not stalled:
+        logging.warning("Constraint Propagation - Strategies narrowing search space")
+
         # Check how many boxes have a determined value
         solved_values_before = len([box
                                     for box in values.keys()
@@ -263,7 +272,13 @@ def reduce_puzzle(values):
         if len([box
                 for box in values.keys()
                 if len(values[box]) == 0]):
+
+            logging.error("Constraint Propagation - Found box with missing values")
+
             return False
+
+    logging.warning("Constraint Propagation - Stalled")
+
     return values
 
 def search(values):
@@ -271,11 +286,18 @@ def search(values):
     Use Depth-First Search (DFS) and Constraint Propagation,
     create a search tree and solve the Sudoku.
     """
+
+    logging.info("Depth-First Search Algorithm processing")
+
     # First, reduce the puzzle with using the reduce_puzzle function
     values = reduce_puzzle(values)
     if values is False:
+        logging.error("Depth-First Search Algorithm - Found box with missing values")
+
         return False # Failed
     if all(len(values[s]) == 1 for s in boxes):
+        logging.info("Depth-First Search Algorithm - Solution found")
+
         return values # Solved!
 
     # Choose one of the unfilled squares with the fewest possibilities
@@ -288,11 +310,19 @@ def search(values):
     # and if one returns a value (not False), return that answer!
     # i.e. loop for 8 and 9 when possibilities for a box is 89
     for value in values[s]:
+
+        logging.info("Depth-First Search Algorithm - Generating recursive tree branch attempt")
+
         new_sudoku = values.copy() # copy of latest Sudoku puzzle with updates from calling reduce_puzzle function
         new_sudoku[s] = value # modify copy (new search tree branch) with attempt at trying reduced possibility of 8
         attempt = search(new_sudoku) # recursion using modified copy with new tree branch attempt
         if attempt: # if does not return False or None from modified copy it returns the values from the attempt
+
+            logging.info("Depth-First Search Algorithm - Attempt success")
+
             return attempt
+        else:
+            logging.info("Depth-First Search Algorithm - Attempt failure")
 
 def solve(grid):
     """
@@ -303,6 +333,9 @@ def solve(grid):
     Returns:
         The dictionary representation of the final sudoku grid. False if no solution exists.
     """
+    logging.info("Loading grid")
+    logging.info("Loading Sudoku puzzle string representation is processing")
+
     # Get Sudoku grid representation with unsolved boxes populated with possible values
     values = grid_values(grid)
     # display(values)
@@ -310,12 +343,14 @@ def solve(grid):
     # of Elimination and Only Choice to solve harder Sudoku problems including those using diagonals as peers
     values = search(values)
 
-    # print("values 1: ", values)
+    logging.info("Depth-First Search Algorithm - Finished")
+
+    logging.debug("Values after search 1: ", values)
 
     if not isinstance(values, bool):
         return values
 
-if __name__ == '__main__':
+def run():
     diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
     # naked_twins_grid1 = '84.632.....34798257..518.6...6.97..24.8256..12..84.6...8..65..3.54.2.7.8...784.96'
     # naked_twins_grid2 = '1.4.9..68956.18.34..84.695151.....868..6...1264..8..97781923645495.6.823.6.854179' # from test1
@@ -323,16 +358,25 @@ if __name__ == '__main__':
 
     values = solve(grid)
 
-    # print("values 2: ", values)
+    logging.debug("Values after solve 2: ", values)
+
+    logging.info("Sudoku values returned after search")
 
     if values:
         display(solve(grid))
 
     try:
         from visualize import visualize_assignments
+
+        logging.info("PyGame using visualize being called")
+
         visualize_assignments(assignments)
 
     except SystemExit:
-        print('SystemExit occurred')
+        logging.exception('SystemExit occurred')
     except:
-        print('We could not visualize your board due to a pygame issue. Not a problem! It is not a requirement.')
+        logging.exception('We could not visualize your board due to a pygame issue. Not a problem! It is not a requirement.')
+
+
+if __name__ == '__main__':
+    run()

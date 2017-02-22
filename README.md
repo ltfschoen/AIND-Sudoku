@@ -72,7 +72,7 @@ When all boxes have a single value (only one possible value) then the problem is
 ### Instructions and Setup Environment
 * Switch to Miniconda env `source activate aind` (same steps as in https://github.com/ltfschoen/aind/blob/master/README.md)
 * IntelliJ: File > Project Structure > Project Settings > Project > Project SDK > Python 3.6.0 (~/miniconda3/bin/python)
-* Run Program and visualise using PyGame: `python solution.py`
+* Run Program and visualise using PyGame: `python main.py --log=DEBUG`
 * Run Tests: `python solution_test.py`
 
 ### Project Specification Checklist - Creating an AI Agent to solve Sudoku https://review.udacity.com/#!/rubrics/689/view
@@ -109,6 +109,8 @@ diagonals to the set of constraints.
 * Bonus
 
 [ ] - Personalised project by implementing other strategies from http://www.sudokudragon.com/sudokustrategy.htm
+
+[ ] - Added 
 
 [X] - PyGame Visualisation of the project
 
