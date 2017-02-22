@@ -348,8 +348,8 @@ def solve(grid):
 
     logging.debug("Values after search 1: ", values)
 
-    assert type(values) is object, "values is not an None: %r" % values
-    assert type(values) is not bool, "values is not a Boolean: %r" % values
+    # assert type(values) is object, "values is not an None: %r" % values
+    # assert type(values) is not bool, "values is not a Boolean: %r" % values
 
     if not isinstance(values, bool):
         return values
