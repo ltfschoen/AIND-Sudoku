@@ -91,6 +91,39 @@ def only_choice(values):
                 values = assign_value(values, dplaces[0], digit)
     return values
 
+def find_naked_twins(possible_twins, values):
+    # Store in list of tuples all pairs of boxes that each contain the same twin possibilities (naked twins)
+
+    logging.info("Naked Twins Strategy - Finding Naked Twins")
+
+    naked_twins = []
+    for box_twin1 in possible_twins:
+        for box_twin2 in peers[box_twin1]:
+            if values[box_twin1] == values[box_twin2]:
+                naked_twins.append((box_twin1, box_twin2))
+    return naked_twins
+
+def eliminate_twin_values_from_peers(naked_twins, values):
+    """
+    Iterate over all the pairs of naked twins.
+    - Find peer boxes that they have in common between them based on calculating their intersection
+    - Iterate over the set of intersecting peers
+    - Delete the naked twins values from each of those intersecting peers that contain over two possible values
+    """
+
+    logging.info("Naked Twins Strategy - Eliminating Twin Values from from Intersecting Peers")
+
+    for index in range(len(naked_twins)):
+        box1, box2 = naked_twins[index][0], naked_twins[index][1]
+        peers1, peers2 = peers[box1], peers[box2]
+        peers_intersection = set(peers1).intersection(peers2)
+        for peer_box in peers_intersection:
+            if len(values[peer_box]) > 2:
+                for digit in values[box1]:
+                    # values[peer_box] = values[peer_box].replace(digit, '')
+                    # PyGame Attempt
+                    values = assign_value(values, peer_box, values[peer_box].replace(digit,''))
+    return values
 
 def naked_twins(values):
     """
@@ -116,29 +149,10 @@ def naked_twins(values):
                       if len(values[box]) == 2]
     # print("Possible naked twins: ", possible_twins)
 
-    # Store in list of tuples all pairs of boxes that each contain the same twin possibilities (naked twins)
-    naked_twins = []
-    for box_twin1 in possible_twins:
-        for box_twin2 in peers[box_twin1]:
-            if values[box_twin1] == values[box_twin2]:
-                naked_twins.append((box_twin1, box_twin2))
-    # print("Naked twins: ", naked_twins)
+    naked_twins = find_naked_twins(possible_twins, values)
 
-    # Iterate over all the pairs of naked twins.
-    #   - Find peer boxes that they have in common between them based on calculating their intersection
-    #   - Iterate over the set of intersecting peers
-    #   - Delete the naked twins values from each of those intersecting peers that contain over two possible values
-    for index in range(len(naked_twins)):
-        box1, box2 = naked_twins[index][0], naked_twins[index][1]
-        peers1, peers2 = peers[box1], peers[box2]
-        peers_intersection = set(peers1).intersection(peers2)
-        for peer_box in peers_intersection:
-            if len(values[peer_box]) > 2:
-                for digit in values[box1]:
-                    # values[peer_box] = values[peer_box].replace(digit, '')
-                    # PyGame Attempt
-                    values = assign_value(values, peer_box, values[peer_box].replace(digit,''))
-    # print("After naked twin: ", values)
+    eliminate_twin_values_from_peers(naked_twins, values)
+
     return values
 
 def reduce_puzzle(values):
