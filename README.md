@@ -110,7 +110,7 @@ diagonals to the set of constraints.
 
 [ ] - Personalised project by implementing other strategies from http://www.sudokudragon.com/sudokustrategy.htm
 
-[ ] - Added 
+[X] - Added Python Logging
 
 [X] - PyGame Visualisation of the project
 

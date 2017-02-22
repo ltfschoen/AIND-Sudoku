@@ -39,7 +39,8 @@ def main():
 
     # Get current logging level
     numeric_level = logging.getLogger().getEffectiveLevel()
-    logging.basicConfig(filename='logger.log', level=numeric_level) # filemode='w',
+    # Note: Logging to file is not working
+    # logging.basicConfig(filename='logger.log', level=numeric_level) # filemode='w',
     logging.info('Starting Sudoku')
     solution.run()
     logging.info('Finished Sudoku')
